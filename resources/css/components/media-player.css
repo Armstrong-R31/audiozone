@@ -1,0 +1,45 @@
+#media-player-wrapper {
+    position: relative;
+    width: 100vw;
+    height: 80px;
+    background-color: var(--element-darker);
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.album-cover {
+    height: 100%;
+    aspect-ratio: 1 / 1;
+    background-color: var(--element-darker);
+    border-radius: 10px;
+}
+
+.track-metadata {
+    flex-direction: column;
+    box-sizing: border-box;
+    overflow: hidden;
+    max-width: 250px;
+    height: 40px;
+    margin: 10px 0 10px 10px;
+}
+
+.track-metadata > * {
+    line-height: 25px;
+}
+
+.track-artist {
+    font-weight: 100;
+}
+
+#media-player {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+}
+
+.track-number {
+    cursor: pointer;
+}
+

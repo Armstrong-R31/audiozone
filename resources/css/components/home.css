@@ -1,0 +1,32 @@
+#home-wrapper {
+    padding: 40px;
+    overflow-y: auto;
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background-color: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: var(--element-medium);
+        border-radius: 10px;
+    }
+}
+
+#extendable {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: fit-content;
+}
+
+.album-wrapper {
+    min-width: 200px;
+}
+
+.headings {
+    margin-top: 20px;
+    padding: 0 !important;
+}
