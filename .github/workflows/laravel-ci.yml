@@ -1,0 +1,48 @@
+name: Laravel CI/CD with Sail
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  laravel-tests:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: testing
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Install Docker Compose
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y docker-compose
+
+    - name: Start Laravel Sail
+      run: |
+        cp .env.example .env
+        ./vendor/bin/sail up -d
+        ./vendor/bin/sail artisan key:generate
+
+    - name: Run Migrations
+      run: ./vendor/bin/sail artisan migrate --force
+
+    - name: Run Tests
+      run: ./vendor/bin/sail test
