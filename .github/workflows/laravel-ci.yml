@@ -1,4 +1,4 @@
-name: Laravel CI/CD with Sail
+name: Laravel CI
 
 on:
   push:
@@ -12,37 +12,35 @@ jobs:
   laravel-tests:
     runs-on: ubuntu-latest
 
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: testing
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping --silent"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-
     steps:
     - name: Checkout Code
       uses: actions/checkout@v3
 
-    - name: Install Docker Compose
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y docker-compose
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 8.1
+        extensions: mbstring, intl, pdo_mysql
+        coverage: none
 
-    - name: Start Laravel Sail
+    - name: Install Composer Dependencies
+      run: composer install --ignore-platform-reqs
+
+    - name: Copy .env
+      run: cp .env.example .env
+
+    - name: Install Sail
       run: |
-        cp .env.example .env
+        alias sail='[ -f sail ] && bash sail || bash vendor/bin/sail'
+        composer require laravel/sail --dev
         ./vendor/bin/sail up -d
+
+    - name: Generate Application Key
+      run: |
+        alias sail='[ -f sail ] && bash sail || bash vendor/bin/sail'
         ./vendor/bin/sail artisan key:generate
 
-    - name: Run Migrations
-      run: ./vendor/bin/sail artisan migrate --force
-
     - name: Run Tests
-      run: ./vendor/bin/sail test
+      run: |
+        alias sail='[ -f sail ] && bash sail || bash vendor/bin/sail'
+        ./vendor/bin/sail test
