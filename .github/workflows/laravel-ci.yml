@@ -23,24 +23,33 @@ jobs:
         extensions: mbstring, intl, pdo_mysql
         coverage: none
 
+    - name: Set up MySQL Database
+      uses: mirromutth/mysql-action@v1
+      with:
+        mysql-version: '8.0'
+        root-password: root
+        database: laravel
+        username: root
+        password: root
+
     - name: Install Composer Dependencies
       run: composer install --ignore-platform-reqs
 
     - name: Copy .env
       run: cp .env.example .env
 
-    - name: Install Sail
+    - name: Set Environment Variables
       run: |
-        alias sail='[ -f sail ] && bash sail || bash vendor/bin/sail'
-        composer require laravel/sail --dev
-        ./vendor/bin/sail up -d
+        sed -i 's/DB_HOST=127.0.0.1/DB_HOST=127.0.0.1/' .env
+        sed -i 's/DB_DATABASE=laravel/DB_DATABASE=laravel/' .env
+        sed -i 's/DB_USERNAME=root/DB_USERNAME=root/' .env
+        sed -i 's/DB_PASSWORD=/DB_PASSWORD=root/' .env
 
     - name: Generate Application Key
-      run: |
-        alias sail='[ -f sail ] && bash sail || bash vendor/bin/sail'
-        ./vendor/bin/sail artisan key:generate
+      run: php artisan key:generate
+
+    - name: Run Migrations
+      run: php artisan migrate --force
 
     - name: Run Tests
-      run: |
-        alias sail='[ -f sail ] && bash sail || bash vendor/bin/sail'
-        ./vendor/bin/sail test
+      run: php artisan test
